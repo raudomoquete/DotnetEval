@@ -1,3 +1,7 @@
+La metodología de versionamiento utilizado en este proyecto es [GITHUB FLOW](https://dev.azure.com/grupouniversal/Soluciones%20TI/_wiki/wikis/Soluciones-TI.wiki/981/Entendiendo-GitFlow-y-GitHub-Flow). En la imagen siguiente se detalla dicho estandar para consulta:
+
+![GitHub Flow.png](./Resources/GitHubFlow.png)
+
 # Evaluación – Programador .NET
 
 ## Objetivo  
