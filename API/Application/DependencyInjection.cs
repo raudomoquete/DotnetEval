@@ -84,25 +84,39 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
                     description: failure.ErrorMessage));
 
             // Check if TResponse is ErrorOr<T>
-            if (typeof(TResponse).IsGenericType && 
-                typeof(TResponse).GetGenericTypeDefinition() == typeof(ErrorOr<>))
+            var responseType = typeof(TResponse);
+            if (responseType.IsGenericType)
             {
-                var valueType = typeof(TResponse).GetGenericArguments()[0];
-                var fromErrorsMethod = typeof(ErrorOr)
-                    .GetMethod(nameof(ErrorOr.ErrorOr.From), new[] { typeof(List<Error>) })
-                    ?.MakeGenericMethod(valueType);
-
-                if (fromErrorsMethod != null)
+                var genericTypeDefinition = responseType.GetGenericTypeDefinition();
+                var errorOrTypeDefinition = typeof(ErrorOr<>);
+                
+                if (genericTypeDefinition == errorOrTypeDefinition)
                 {
-                    var errorOrResult = fromErrorsMethod.Invoke(null, new object[] { errors });
-                    if (errorOrResult is TResponse response)
+                    var valueType = responseType.GetGenericArguments()[0];
+                    
+                    // Create ErrorOr<TValue> from errors using reflection
+                    // ErrorOr has a static method: FromErrors<TValue>(List<Error> errors)
+                    var constructedErrorOrType = errorOrTypeDefinition.MakeGenericType(valueType);
+                    
+                    // Try to find FromErrors method
+                    var fromErrorsMethod = constructedErrorOrType.GetMethod("FromErrors", 
+                        System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static,
+                        null,
+                        new[] { typeof(List<Error>) },
+                        null);
+
+                    if (fromErrorsMethod != null)
                     {
-                        return response;
+                        var errorOrResult = fromErrorsMethod.Invoke(null, new object[] { errors });
+                        if (errorOrResult != null && errorOrResult is TResponse response)
+                        {
+                            return response;
+                        }
                     }
                 }
             }
 
-            // If not ErrorOr, throw exception (will be caught by GlobalExceptionHandler)
+            // If not ErrorOr or conversion failed, throw exception (will be caught by GlobalExceptionHandler)
             throw new FluentValidation.ValidationException(failures);
         }
 

@@ -40,9 +40,6 @@ public class ApplicationDbContext : Microsoft.EntityFrameworkCore.DbContext
             entity.HasIndex(e => e.Email)
                 .IsUnique();
 
-            // Set default values
-            entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("GETUTCDATE()");
         });
     }
 }

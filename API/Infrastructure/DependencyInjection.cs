@@ -3,6 +3,7 @@ using Infrastructure.External;
 using Infrastructure.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure;
