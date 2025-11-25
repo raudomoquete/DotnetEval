@@ -1,4 +1,5 @@
 using Infrastructure.Data.DbContext;
+using Infrastructure.External;
 using Infrastructure.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
@@ -29,9 +30,12 @@ public static class DependencyInjection
         services.AddScoped<IPasswordHasher, PasswordHasher>();
         services.AddScoped<IJwtTokenService, JwtTokenService>();
 
-        // TODO: Add other infrastructure services here
-        // - External API clients
-        // - Repositories (if needed)
+        // Add HTTP Client for external API
+        services.AddHttpClient<IJsonPlaceholderClient, JsonPlaceholderClient>(client =>
+        {
+            client.BaseAddress = new Uri("https://jsonplaceholder.typicode.com");
+            client.Timeout = TimeSpan.FromSeconds(30);
+        });
 
         return services;
     }
