@@ -1,9 +1,13 @@
+using System.Text;
 using Application;
 using API.Middleware;
 using FluentValidation;
 using Infrastructure;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 
 namespace API;
 
@@ -28,11 +32,33 @@ public static class DependencyInjection
         // Add Infrastructure layer services
         services.AddInfrastructure(configuration);
 
-        // TODO: Add JWT Authentication configuration
-        // services.AddAuthentication(...)
-        // services.AddAuthorization(...)
+        // Configure JWT Authentication
+        var jwtSecretKey = configuration["Jwt:SecretKey"] 
+            ?? throw new InvalidOperationException("JWT SecretKey is not configured");
+        var jwtIssuer = configuration["Jwt:Issuer"] ?? "EvaluacionDotnet";
+        var jwtAudience = configuration["Jwt:Audience"] ?? "EvaluacionDotnet";
 
-        // TODO: Add custom middleware registration if needed
+        services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = jwtIssuer,
+                ValidAudience = jwtAudience,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecretKey)),
+                ClockSkew = TimeSpan.Zero
+            };
+        });
+
+        services.AddAuthorization();
 
         return services;
     }

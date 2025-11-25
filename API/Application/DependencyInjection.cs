@@ -1,4 +1,5 @@
 using System.Reflection;
+using ErrorOr;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -40,6 +41,7 @@ public static class DependencyInjection
 /// <summary>
 /// Validation behavior for MediatR pipeline
 /// Automatically validates requests using FluentValidation before handler execution
+/// Converts validation errors to ErrorOr format
 /// </summary>
 /// <typeparam name="TRequest">The request type</typeparam>
 /// <typeparam name="TResponse">The response type</typeparam>
@@ -75,6 +77,32 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
 
         if (failures.Count != 0)
         {
+            // Convert FluentValidation errors to ErrorOr errors
+            var errors = failures.ConvertAll(failure =>
+                Error.Validation(
+                    code: failure.PropertyName ?? "ValidationError",
+                    description: failure.ErrorMessage));
+
+            // Check if TResponse is ErrorOr<T>
+            if (typeof(TResponse).IsGenericType && 
+                typeof(TResponse).GetGenericTypeDefinition() == typeof(ErrorOr<>))
+            {
+                var valueType = typeof(TResponse).GetGenericArguments()[0];
+                var fromErrorsMethod = typeof(ErrorOr)
+                    .GetMethod(nameof(ErrorOr.ErrorOr.From), new[] { typeof(List<Error>) })
+                    ?.MakeGenericMethod(valueType);
+
+                if (fromErrorsMethod != null)
+                {
+                    var errorOrResult = fromErrorsMethod.Invoke(null, new object[] { errors });
+                    if (errorOrResult is TResponse response)
+                    {
+                        return response;
+                    }
+                }
+            }
+
+            // If not ErrorOr, throw exception (will be caught by GlobalExceptionHandler)
             throw new FluentValidation.ValidationException(failures);
         }
 

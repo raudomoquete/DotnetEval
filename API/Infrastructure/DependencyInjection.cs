@@ -1,3 +1,5 @@
+using Infrastructure.Data.DbContext;
+using Infrastructure.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
@@ -20,13 +22,14 @@ public static class DependencyInjection
         IConfiguration configuration)
     {
         // Add InMemory Database
-        // TODO: Uncomment when ApplicationDbContext is created
-        // services.AddDbContext<ApplicationDbContext>(options =>
-        //     options.UseInMemoryDatabase("EvaluacionDotnetDb"));
+        services.AddDbContext<ApplicationDbContext>(options =>
+            options.UseInMemoryDatabase("EvaluacionDotnetDb"));
+
+        // Add infrastructure services
+        services.AddScoped<IPasswordHasher, PasswordHasher>();
+        services.AddScoped<IJwtTokenService, JwtTokenService>();
 
         // TODO: Add other infrastructure services here
-        // - Password hashing service (BCrypt)
-        // - JWT token service
         // - External API clients
         // - Repositories (if needed)
 
