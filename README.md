@@ -1,89 +1,222 @@
-La metodología de versionamiento utilizado en este proyecto es [GITHUB FLOW](https://dev.azure.com/grupouniversal/Soluciones%20TI/_wiki/wikis/Soluciones-TI.wiki/981/Entendiendo-GitFlow-y-GitHub-Flow). En la imagen siguiente se detalla dicho estandar para consulta:
 
-![GitHub Flow.png](./Resources/GitHubFlow.png)
+---
 
-# Evaluación – Programador .NET
+# 🚀 Instrucciones de Instalación y Ejecución
 
-## Objetivo  
-Desarrollar una aplicación API Restful.
+## Requisitos Previos
+- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
+- Visual Studio 2022, VS Code o cualquier editor compatible con .NET
 
-## Requerimientos  
-- Utilizar **.NET 8**.  
-- La API debe de utilizar una **base de datos en memoria**. Es decir, toda información solo se conservará mientras la aplicación esté en ejecución. Puede revisar la siguiente documentación:  
-	[Proveedor de base de datos InMemory - EF Core | Microsoft Learn](https://learn.microsoft.com/en-us/ef/core/providers/in-memory/)  
+## Pasos para Ejecutar
 
-### Primera parte:  
-- Debe crear un **endpoint** que reciba la siguiente estructura JSON y la guarde en una tabla.  
-- Utilizar **BCrypt** para la encriptación de contraseñas. Puede revisar la siguiente librería: [BCrypt.Net-Next](https://www.nuget.org/packages/BCrypt.Net-Next)  
-- El **endpoint de creación de usuarios** debe validar los siguientes datos y, en caso de que no se cumpla, retornar un error **HTTP 400** indicando el motivo:  
-	- El campo de **nombre** no está vacío.  
-	- Es un **correo válido** (utilizar una expresión regular).  
-	- La **contraseña** utiliza mayúsculas, minúsculas, símbolos y tiene más de **8 caracteres** (utilizar una expresión regular).  
-	- El **correo no se encuentre registrado**.  
-- El endpoint debe retornar la siguiente información:  
-	- **Nombre registrado**.  
-	- **Correo registrado**.  
-	- **Identificador único** (puede ser un GUID).  
-	- **Token de acceso JWT** persistido por el identificador del usuario.  
-		> **Nota:** La clave de encriptación del token debe estar presente en el archivo de configuración **appsettings.json**.  
+1. **Clonar el repositorio** (si aplica)
+   ```bash
+   git clone <url-del-repositorio>
+   cd EvaluacionDotnet
+   ```
 
-- Debe crear otro **endpoint** para la **autenticación del usuario**.  
-	- Este endpoint debe recibir un **correo y una contraseña**.  
-	- En caso de ser un usuario registrado con su contraseña válida, debe retornar el **token JWT**.  
+2. **Navegar al proyecto API**
+   ```bash
+   cd API/API
+   ```
 
-### Segunda parte:  
-- El siguiente **endpoint** solo puede ser consumido utilizando el **token JWT** proporcionado al usuario al momento de la creación o inicio de sesión.  
-	- En caso de que no se envíe un **token válido**, retornar un **HTTP 401**.  
+3. **Restaurar dependencias**
+   ```bash
+   dotnet restore
+   ```
 
-- Debe crear un **endpoint** que lea información de la siguiente API y la muestre como respuesta:  
-	- [`https://jsonplaceholder.typicode.com/posts`](https://jsonplaceholder.typicode.com/posts)  
+4. **Compilar el proyecto**
+   ```bash
+   dotnet build
+   ```
 
-- Debe crear un **endpoint** que inserte información en la siguiente API y muestre la respuesta:  
-	- [`https://jsonplaceholder.typicode.com/posts`](https://jsonplaceholder.typicode.com/posts)  
+5. **Ejecutar la aplicación**
+   ```bash
+   dotnet run
+   ```
 
-## Opcional:  
-- Utilizar **FluentValidation** para las validaciones de datos de entrada.  
-- Utilizar un archivo de configuración (ej. **appsettings.json**) para leer las expresiones regulares a utilizar.  
-- Implementar **Swagger**.  
-- Crear **pruebas unitarias**.  
+6. **Acceder a Swagger**
+   - La aplicación se ejecutará en `https://localhost:7034` (o puerto configurado)
+   - Abrir en el navegador: `https://localhost:7034/swagger`
 
-# 📌 Puntos a Evaluar – Evaluación Programador .NET  
+---
 
-## 1️⃣ **Calidad y limpieza del código**  
-✅ Código bien estructurado, modular y reutilizable.  
-✅ Nombres de variables, métodos y clases descriptivos.  
-✅ Ausencia de código duplicado y comentarios innecesarios.  
-✅ Uso adecuado de patrones de diseño si aplica.  
+# Guía de Prueba de Endpoints
 
-## 2️⃣ **Uso de buenas prácticas en .NET**  
-✅ Uso de **Dependency Injection (DI)**.  
-✅ Manejo adecuado de **configuración** en `appsettings.json`.  
-✅ Manejo de excepciones a nivel global de la aplicación.
-✅ Uso eficiente de **async/await** para operaciones asíncronas.  
+## Usando Swagger UI
 
-## 3️⃣ **Seguridad**  
-✅ Uso de **BCrypt** para encriptación de contraseñas.  
-✅ Implementación correcta de **JWT** para autenticación.  
-✅ Validación de datos con **expresiones regulares** y otras técnicas.  
-✅ Protección contra ataques como **SQL Injection** o **XSS** (si aplica).  
+Swagger está configurado y disponible en `/swagger` cuando la aplicación está ejecutándose.
 
-## 4️⃣ **Uso de Entity Framework Core**  
-✅ Uso de **InMemory Database** correctamente implementado.  
-✅ Definición correcta de modelos y relaciones.  
+### Flujo de Prueba:
 
-## 5️⃣ **Endpoints y funcionalidad**  
-✅ Validaciones adecuadas en la creación de usuarios.  
-✅ Manejo correcto de errores con códigos HTTP adecuados.  
-✅ Implementación de autenticación y autorización con JWT.  
-✅ Consumo e integración correcta de la API externa `jsonplaceholder.typicode.com`.  
+#### 1. **Registrar un Usuario** (`POST /api/users/register`)
 
-## 6️⃣ **Documentación y usabilidad**  
-✅ Archivos README con instrucciones claras de instalación y ejecución.  
-✅ Explicación de cómo probar los endpoints (Postman, Swagger, etc.).
+1. Busca el endpoint `POST /api/users/register`
+2. Haz clic en **"Try it out"**
+3. Ingresa el siguiente JSON en el body:
+```json
+{
+  "name": "Raudo Moquete",
+  "email": "raudo.moquete@example.com",
+  "password": "SecurePass123!"
+}
+```
+> **Nota sobre la contraseña:** Debe contener mayúsculas, minúsculas, números, símbolos y tener más de 8 caracteres.
 
-## 8️⃣ **Extras (Opcionales pero valorados)**  
-✅ Uso de **FluentValidation** para validar datos de entrada.  
-✅ Implementación de **pruebas unitarias** con xUnit o NUnit.
-✅ Uso de **Swagger** para documentar la API.  
+4. Haz clic en **"Execute"**
+5. **Copia el `token`** de la respuesta - lo necesitarás para los endpoints protegidos
 
-📊 **Calificación final** basada en el cumplimiento de estos criterios. ¡Buena suerte! 🚀  
+#### 2. **Autenticar Usuario** (`POST /api/users/authenticate`)
+
+1. Busca el endpoint `POST /api/users/authenticate`
+2. Haz clic en **"Try it out"**
+3. Ingresa el siguiente JSON:
+```json
+{
+  "email": "raudo.moquete@example.com",
+  "password": "SecurePass123!"
+}
+```
+4. Haz clic en **"Execute"**
+5. **Copia el `token`** de la respuesta
+
+#### 3. **Configurar Autenticación JWT en Swagger**
+
+1. En la parte superior de Swagger, haz clic en el botón **"Authorize"**
+2. En el campo de texto, **pega SOLO el token** (sin "Bearer", sin comillas)
+3. Haz clic en **"Authorize"** y luego **"Close"**
+4. Ahora todos los endpoints protegidos tendrán el token configurado automáticamente
+
+#### 4. **Obtener Posts** (`GET /api/posts`)
+
+1. Busca el endpoint `GET /api/posts` (tiene un candado indicando que requiere autenticación)
+2. Haz clic en **"Try it out"**
+3. Haz clic en **"Execute"**
+4. Deberías ver una lista de posts de la API externa
+
+#### 5. **Crear Post** (`POST /api/posts`)
+
+1. Busca el endpoint `POST /api/posts` (tiene un candado)
+2. Haz clic en **"Try it out"**
+3. Ingresa el siguiente JSON:
+```json
+{
+  "userId": 1,
+  "title": "Mi primer post",
+  "body": "Este es el contenido de mi post"
+}
+```
+4. Haz clic en **"Execute"**
+5. Deberías ver el post creado con un ID generado
+
+---
+
+## Usando Postman
+
+### Configuración Inicial
+
+1. **Importar la colección** (opcional):
+   - Puedes crear una nueva colección en Postman llamada "EvaluacionDotnet API"
+
+2. **Configurar Variable de Entorno**:
+   - Crea una variable `baseUrl` con valor: `https://localhost:7034`
+   - Crea una variable `token` (se llenará automáticamente después de autenticarte)
+
+### Endpoints Públicos (No requieren autenticación)
+
+#### 1. Registrar Usuario
+- **Método:** `POST`
+- **URL:** `{{baseUrl}}/api/users/register`
+- **Headers:**
+  - `Content-Type: application/json`
+- **Body (raw JSON):**
+```json
+{
+  "name": "Raudo Moquete",
+  "email": "raudo.moquete@example.com",
+  "password": "SecurePass123!"
+}
+```
+- **Response:** Copia el `token` del response y guárdalo en la variable `token`
+
+#### 2. Autenticar Usuario
+- **Método:** `POST`
+- **URL:** `{{baseUrl}}/api/users/authenticate`
+- **Headers:**
+  - `Content-Type: application/json`
+- **Body (raw JSON):**
+```json
+{
+  "email": "raudo.moquete@example.com",
+  "password": "SecurePass123!"
+}
+```
+- **Response:** Copia el `token` del response
+
+### Endpoints Protegidos (Requieren JWT)
+
+#### 3. Obtener Posts
+- **Método:** `GET`
+- **URL:** `{{baseUrl}}/api/posts`
+- **Headers:**
+  - `Authorization: Bearer {{token}}`
+  - `Content-Type: application/json`
+
+#### 4. Crear Post
+- **Método:** `POST`
+- **URL:** `{{baseUrl}}/api/posts`
+- **Headers:**
+  - `Authorization: Bearer {{token}}`
+  - `Content-Type: application/json`
+- **Body (raw JSON):**
+```json
+{
+  "userId": 1,
+  "title": "Mi primer post",
+  "body": "Este es el contenido de mi post"
+}
+```
+
+### Script para Guardar Token Automáticamente en Postman
+
+En Postman, puedes agregar el siguiente script en la pestaña **"Tests"** del request de autenticación o registro para guardar automáticamente el token:
+
+```javascript
+if (pm.response.code === 200) {
+    var jsonData = pm.response.json();
+    if (jsonData.token) {
+        pm.environment.set("token", jsonData.token);
+        console.log("Token guardado automáticamente");
+    }
+}
+```
+
+---
+
+## Validaciones y Casos de Error
+
+### Validaciones de Registro
+
+| Caso | Request | Código HTTP Esperado |
+|------|---------|---------------------|
+| Email inválido | `{"name": "Test", "email": "invalid-email", "password": "SecurePass123!"}` | 400 |
+| Contraseña débil | `{"name": "Test", "email": "test@example.com", "password": "123"}` | 400 |
+| Nombre vacío | `{"name": "", "email": "test@example.com", "password": "SecurePass123!"}` | 400 |
+| Email duplicado | Intentar registrar el mismo email dos veces | 409 |
+
+### Casos de Autenticación
+
+| Caso | Request | Código HTTP Esperado |
+|------|---------|---------------------|
+| Usuario no encontrado | `{"email": "nonexistent@example.com", "password": "Pass123!"}` | 404 |
+| Contraseña incorrecta | Email válido pero contraseña incorrecta | 400 |
+
+### Casos de Endpoints Protegidos
+
+| Caso | Resultado |
+|------|-----------|
+| Sin token | HTTP 401 Unauthorized |
+| Token inválido/expirado | HTTP 401 Unauthorized |
+| Token válido | Operación exitosa |
+
+---
